@@ -34,3 +34,9 @@ services:
         depends_on:
             - web
             - celery
+    nginx:
+        build: ./nginx
+        ports:
+            - 80:80
+        depends_on:
+            - web
