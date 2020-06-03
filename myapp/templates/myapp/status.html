@@ -5,17 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>rishid</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 </head>
 <body>
-    <section class="section">
+    <section class="hero">
+        <div class="hero-body">
         <div class="container">
             <h4 class="title is-4">Hello world!</h4>
-            <p class="subtitle">Keep refreshing to see info get updated</p>
-            <p>Task id is {{ result_id }}</p>
-            <p>Task state is {{ result_state }}</p>
-            <p>Info is {{ result_info }}</p>
+            <p class="subtitle">Django, Celery, Redis, Docker example</p>
+        </div>
         </div>
     </section>
+    <section>
+        <div id="app" class="container">
+            <p>Task status: ${ current } / ${ total } completed</p>
+        </div>
+    </section>
+    <script>
+        var app = new Vue({
+            delimiters: ['${', '}'],
+            el: "#app",
+            data: {
+                current: 0,
+                total: 0,
+                timer: ''
+            },
+            methods: {
+                updateStatus: function() {
+                    var self = this;
+                    $.getJSON('/get_status/', (info) => {
+                        this.current = info["current"];
+                        this.total = info["total"];
+                        if(this.current == this.total) {
+                            clearInterval(this.timer);
+                        }
+                    });
+                }
+            },
+            created() {
+                this.updateStatus();
+                this.timer = setInterval(this.updateStatus, 1000)
+            },
+            beforeDestroy() {
+                clearInterval(this.timer);
+            }
+        })
+    </script>
 </body>
 </html>
 
