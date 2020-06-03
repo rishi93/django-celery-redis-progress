@@ -16,15 +16,17 @@ def index(request):
 
 def start(request):
     result = bigtask.delay()
-    redis_instance.set('task_id', result.id)
-    return render(request, 'myapp/start.html', {'task_id': str(result.id)})
+    task_id = result.id
+    redis_instance.set('task_id', task_id)
+    return render(request, 'myapp/start.html', {'task_id': task_id})
 
 
 def status(request):
-    result = AsyncResult(redis_instance.get('task_id'))
+    task_id = redis_instance.get('task_id')
+    result = AsyncResult(task_id)
     return render(
         request,
-        'myapp/status.html', 
+        'myapp/status.html',
         {
             'result_id': result.id,
             'result_state': result.state,
